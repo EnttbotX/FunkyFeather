@@ -1,0 +1,23 @@
+# --------------------------------------
+# --------------CONFIG.YML--------------
+# -------------FunkyFeather-------------
+# --------------------------------------
+
+Config:
+  Feather:
+    Name: "&2Funky Feather"
+    Lore:
+      - "&eSpecial Item"
+      - "&7Protects your inventory but"
+      - "&7gets consumed on death if"
+      - "&7in your hotbar."
+    Consume-Message: "&2&LYour inventory has been keeped! &cCost: -1 &lFeather"
+
+  respawn-zone:
+    # you can put this in false if you use another spawn plugin like onDeathSpawn.
+    # if this is false you can´t use /ff setrespawn.
+    # if you use this you need to use first the command /ff setrespawn.
+    set-respawn-enabled: true
+
+    # Automatically created by the /ff setrespawn command.
+    zone:

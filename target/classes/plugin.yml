@@ -1,0 +1,14 @@
+main: fun.Entt.FunkyFeather.FunkyFeather
+version: 1.0.0
+name: FunkyFeather
+authors: [Enttbot]
+description: "Keep items or exp on death if you have the Funky Feather"
+api-version: "1.13"
+
+commands:
+  funkyfeather:
+    description: main command of ff.
+    aliases:
+      - ff
+      - funkyf
+      - ffeather
