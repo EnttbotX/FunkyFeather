@@ -1,0 +1,35 @@
+# --------------------------------------
+# --------------CONFIG.YML--------------
+# -------------FunkyFeather-------------
+# --------------------------------------
+
+# update notes v1.1.0:
+# - added vault as softdepend(not necessary)
+# - added config versions
+
+# don't touch this
+config-version: 1.1
+
+Config:
+  # Vault API Integrations (Vault needed)
+  Vault:
+    enabled: true
+    give-cost: 10
+    use-cost: 5
+
+  Feather:
+    Name: "&2Funky Feather"
+    Lore:
+      - "&eSpecial Item"
+      - "&7Protects your inventory but"
+      - "&7gets consumed on death if"
+      - "&7in your inventory."
+    Consume-Message: "&2&LYour inventory has been kept! &cCost: -1 &lFeather"
+
+  respawn-zone:
+    # if this is false you can´t use /ff setrespawn.
+    # if you use this you need to use first the command /ff setrespawn.
+    enabled: true
+
+    # Auto-generated
+    zone:
