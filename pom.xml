@@ -7,6 +7,7 @@
     <groupId>fun.Entt.FunkyFeather</groupId>
     <artifactId>FunkyFeather</artifactId>
     <version>1.1.1</version>
+    <name>FunkyFeather-${project.version}</name>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
