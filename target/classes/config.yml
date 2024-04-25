@@ -1,35 +1,54 @@
-# --------------------------------------
-# --------------CONFIG.YML--------------
-# -------------FunkyFeather-------------
-# --------------------------------------
+#    ________ ________
+#   |\  _____\\  _____\
+#   \ \  \__/\ \  \__/
+#    \ \   __\\ \   __\
+#     \ \  \_| \ \  \_|
+#      \ \__\   \ \__\
+#       \|__|    \|__|
+#         FunkyFeather
 
-# update notes v1.1.0:
-# - added vault as softdepend(not necessary)
-# - added config versions
+  # change logs v1.2.0:
+# - added more configs to the feather
+# - added an update checker
+# - console can use commands
 
-# don't touch this
-config-version: 1.1
+# actual placeholders: (non-compatible with PAPI)
+  # %ff_name%
+  # %player%
 
-Config:
-  # Vault API Integrations (Vault needed)
-  Vault:
-    enabled: true
-    give-cost: 10
-    use-cost: 5
+# Vault API Integrations (Vault needed)
+Vault:
+  enabled: true
+  give-cost: 10
+  use-cost: 5
 
-  Feather:
-    Name: "&2Funky Feather"
-    Lore:
-      - "&eSpecial Item"
-      - "&7Protects your inventory but"
-      - "&7gets consumed on death if"
-      - "&7in your inventory."
-    Consume-Message: "&2&LYour inventory has been kept! &cCost: -1 &lFeather"
+Feather:
+  Material: FEATHER
+  Enchanted: true
+  Name: "&2Funky Feather" # this is %ff_name%
+  Lore:
+    - "&eSpecial Item"
+    - "&7Protects your inventory but"
+    - "&7gets consumed on death if"
+    - "&7in your inventory."
 
-  respawn-zone:
-    # if this is false you can´t use /ff setrespawn.
-    # if you use this you need to use first the command /ff setrespawn.
-    enabled: true
+Messages:
+  give:
+    - "&2&lYou receive a %ff_name%"
+  gave_to_player:
+    - "&2You gave a %ff_name% to %player% &C[-10]"
+  use:
+    - "&2&lYour inventory has been kept!"
+    - "&cCost: -1 %ff_name%"
+  last_feather_used:
+    - "&2You use your last %ff_name%!"
+  no_money:
+    - "&cYou don't have enough money to use/get a %ff_name%"
+  no_feathers:
+    - "&cYou don't have any %ff_name%"
 
-    # Auto-generated
-    zone:
+respawn-zone:
+  enabled: true
+
+  # Auto-generated
+  zone:

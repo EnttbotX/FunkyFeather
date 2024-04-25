@@ -17,6 +17,8 @@ import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Objects;
 
 import static fun.Entt.FunkyFeather.FunkyFeather.econ;
 
@@ -86,8 +88,8 @@ public class MainListener implements Listener {
             MCM mcm = plugin.getMCM();
             FileConfiguration config = mcm.getConfig();
 
-            if (config.getBoolean("Config.respawn-zone.set-respawn-enabled")) {
-                String path = "Config.respawn-zone.zone";
+            if (config.getBoolean("respawn-zone.set-respawn-enabled")) {
+                String path = "respawn-zone.zone";
                 if (config.contains(path)) {
                     double x = config.getDouble(path + ".x");
                     double y = config.getDouble(path + ".y");
@@ -116,7 +118,7 @@ public class MainListener implements Listener {
         MCM mcm = plugin.getMCM();
         FileConfiguration config = mcm.getConfig();
         ItemStack feather = findFunkyFeather(player);
-        String showName = config.getString("Config.Feather.Name");
+        String showName = config.getString("Feather.Name");
         int UseCost = mcm.getUseCost();
 
         if (feather != null) {
@@ -127,39 +129,55 @@ public class MainListener implements Listener {
                         if (amount > 0) {
                             feather.setAmount(amount - 1);
                             econ.withdrawPlayer(player, UseCost);
-                            player.sendMessage(MSGU.color(FunkyFeather.prefix + "&2You used an " + showName + "! &c(- $" + UseCost + ")"));
+                            List<String> messages = config.getStringList("Messages.use");
+                            String messageFormat = String.join(" ", messages);
+                            player.sendMessage(MSGU.color(messageFormat.replace("%ff_name%", Objects.requireNonNull(config.getString("Feather.Name"))).replace("%player%", player.getName())));
                         } else {
                             player.getInventory().remove(feather);
                             econ.withdrawPlayer(player, UseCost);
-                            player.sendMessage(MSGU.color(FunkyFeather.prefix + "&aYou used your last " + showName + "!"));
+                            List<String> messages = config.getStringList("Messages.last_feather_used");
+                            String messageFormat = String.join(" ", messages);
+                            player.sendMessage(MSGU.color(messageFormat.replace("%ff_name%", Objects.requireNonNull(config.getString("Feather.Name"))).replace("%player%", player.getName())));
                         }
                     } else {
-                        player.sendMessage(MSGU.color(FunkyFeather.prefix + "&cYou don't have enough money to use a " + showName));
+                        List<String> messages = config.getStringList("Messages.no_money");
+                        String messageFormat = String.join(" ", messages);
+                        player.sendMessage(MSGU.color(messageFormat.replace("%ff_name%", Objects.requireNonNull(config.getString("Feather.Name"))).replace("%player%", player.getName())));
                     }
                 } else {
                     int amount = feather.getAmount();
                     if (amount > 0) {
                         feather.setAmount(amount - 1);
                         econ.withdrawPlayer(player, UseCost);
-                        player.sendMessage(MSGU.color(FunkyFeather.prefix + "&2You used an " + showName + "! &c(- $" + UseCost + ")"));
+                        List<String> messages = config.getStringList("Messages.use");
+                        String messageFormat = String.join(" ", messages);
+                        player.sendMessage(MSGU.color(messageFormat.replace("%ff_name%", Objects.requireNonNull(config.getString("Feather.Name"))).replace("%player%", player.getName())));
                     } else {
                         player.getInventory().remove(feather);
                         econ.withdrawPlayer(player, UseCost);
-                        player.sendMessage(MSGU.color(FunkyFeather.prefix + "&aYou used your last " + showName + "!"));
+                        List<String> messages = config.getStringList("Messages.last_feather_used");
+                        String messageFormat = String.join(" ", messages);
+                        player.sendMessage(MSGU.color(messageFormat.replace("%ff_name%", Objects.requireNonNull(config.getString("Feather.Name"))).replace("%player%", player.getName())));
                     }
                 }
             } else {
                 int amount = feather.getAmount();
                 if (amount > 0) {
                     feather.setAmount(amount - 1);
-                    player.sendMessage(MSGU.color(FunkyFeather.prefix + "&2You used an " + showName + "!"));
+                    List<String> messages = config.getStringList("Messages.use");
+                    String messageFormat = String.join(" ", messages);
+                    player.sendMessage(MSGU.color(messageFormat.replace("%ff_name%", Objects.requireNonNull(config.getString("Feather.Name"))).replace("%player%", player.getName())));
                 } else {
                     player.getInventory().remove(feather);
-                    player.sendMessage(MSGU.color(FunkyFeather.prefix + "&aYou used your last " + showName + "!"));
+                    List<String> messages = config.getStringList("Messages.last_feather_used");
+                    String messageFormat = String.join(" ", messages);
+                    player.sendMessage(MSGU.color(messageFormat.replace("%ff_name%", Objects.requireNonNull(config.getString("Feather.Name"))).replace("%player%", player.getName())));
                 }
             }
         } else {
-            player.sendMessage(MSGU.color(FunkyFeather.prefix + "&cYou don't have any " + showName + "!"));
+            List<String> messages = config.getStringList("Messages.no_feathers");
+            String messageFormat = String.join(" ", messages);
+            player.sendMessage(MSGU.color(messageFormat.replace("%ff_name%", Objects.requireNonNull(config.getString("Feather.Name"))).replace("%player%", player.getName())));
         }
     }
 

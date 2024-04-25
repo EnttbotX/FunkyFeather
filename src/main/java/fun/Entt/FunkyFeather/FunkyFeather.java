@@ -4,6 +4,7 @@ import fun.Entt.FunkyFeather.commands.MainCMD;
 import fun.Entt.FunkyFeather.config.MCM;
 import fun.Entt.FunkyFeather.listeners.MainListener;
 import fun.Entt.FunkyFeather.utils.MSGU;
+import fun.Entt.FunkyFeather.utils.UpdateChecker;
 
 import net.milkbowl.vault.economy.Economy;
 
@@ -17,11 +18,15 @@ import java.io.File;
 public class FunkyFeather extends JavaPlugin {
     public static String prefix = "&e&l[Funky Feather] ";
     private final String version = getDescription().getVersion();
-    private MCM mcm;
     public static Economy econ = null;
+    private UpdateChecker updateChecker;
+    private int resourceId = 115289;
+    private MCM mcm;
 
     @Override
     public void onEnable() {
+        other.bStats.MetricsLite metrics = new other.bStats.MetricsLite(this);
+
         try {
             saveDefaultConfig();
             mcm = new MCM(this);
@@ -31,6 +36,7 @@ public class FunkyFeather extends JavaPlugin {
             registerCommands();
             registerEvents();
             registerConfig();
+            updateCheck();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -38,7 +44,7 @@ public class FunkyFeather extends JavaPlugin {
         if (mcm.isVaultIntEnabled()) {
             if (!setupEconomy()) {
                 this.getLogger().severe("Vault integration disabled for FunkyFeather");
-                mcm.getConfig().getBoolean("Config.Vault.enabled", false);
+                mcm.getConfig().set("Config.Vault.enabled", false);
             }
         }
     }
@@ -46,7 +52,7 @@ public class FunkyFeather extends JavaPlugin {
     @Override
     public void onDisable() {
         Bukkit.getConsoleSender().sendMessage
-                (MSGU.color(prefix + "&av" + version + "&cDisabled"));
+                (MSGU.color(prefix + "&av" + version + " &cDisabled"));
     }
 
     public void registerCommands() {
@@ -65,6 +71,21 @@ public class FunkyFeather extends JavaPlugin {
             config.options().copyDefaults(true);
         }
     }
+
+    public void updateCheck() {
+        updateChecker = new UpdateChecker(this, resourceId);
+
+        try {
+            if (updateChecker.isUpdateAvailable()) {
+                getLogger().info(MSGU.color(prefix + "&cThere is an new update of the plugin"));
+            } else {
+                getLogger().info(MSGU.color(prefix + "&2Plugin updated"));
+            }
+        } catch (Exception e) {
+            getLogger().warning(MSGU.color(prefix + "&4&lError searching newer versions: " + e.getMessage()));
+        }
+    }
+
     public MCM getMCM() {
         return mcm;
     }

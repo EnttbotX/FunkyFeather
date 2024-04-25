@@ -1,4 +1,4 @@
-package other.bstats;
+package other.bStats;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -363,5 +363,4 @@ public class MetricsLite {
         gzip.close();
         return outputStream.toByteArray();
     }
-
 }

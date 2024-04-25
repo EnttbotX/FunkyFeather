@@ -1,13 +1,33 @@
 main: fun.Entt.FunkyFeather.FunkyFeather
-version: 1.1.1
+version: 1.2.0
 name: FunkyFeather
 authors: [Enttbot]
 description: "Keep items or exp on death if you have the Funky Feather"
 api-version: "1.13"
-softdepend: [Vault]
+softdepend:
+  - Vault
+  - PlaceholderAPI
 
 commands:
   funkyfeather:
     description: main command of ff.
     aliases:
       - ff
+
+permissions:
+  ff.*:
+    description: access to all permissions and commands of ff.
+    default: op
+    children:
+      ff.keep: true
+      ff.setrespawn: true
+      ff.give-feather: true
+  ff.keep:
+    description: use an special feather.
+    default: true
+  ff.give:
+    description: receive an special feather.
+    default: op
+  ff.setrespawn:
+    description: sets the respawn to players.
+    default: op
