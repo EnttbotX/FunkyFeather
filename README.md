@@ -1,7 +1,13 @@
 # FunkyFeather
-Keep items or exp on death if you have the Funky Feather
+FunkyFeather that give you the "mechanic" to dont lose your stuff and xp when you die
 
-Here are a bit of help:
 
-to have free feathers use:
-/ff give -wc (wc: without costs)
+all info on spigot:
+https://www.spigotmc.org/resources/funky-feather-keepinventory-feather-1-7-1-20-4.115289/
+
+
+
+
+
+Donate to the proyect:
+https://paypal.me/Enttbot
