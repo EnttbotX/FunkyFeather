@@ -51,7 +51,7 @@ public class FF extends JavaPlugin {
             FileConfiguration config = fh.getConfig();
             if (!setupEconomy()) {
                 this.getLogger().severe(MSG.color(prefix + "&cVault is null, disabling in &5FunkyFeather &dv" + version));
-                config.set("Config.Vault.enabled", false);
+                config.set("Vault.enabled", false);
                 fh.saveConfig();
             }
         }

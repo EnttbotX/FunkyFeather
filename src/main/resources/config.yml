@@ -30,11 +30,11 @@ Feather:
     - "&7gets consumed on death if"
     - "&7in your inventory."
   Enchant:
-    glint: true
+    hide-enchants: true
     enchants:
-      - "FIRE_ASPECT, 2"
+      - "FIRE_ASPECT : 2"
     effects:
-      mode: "IN_HAND" # IN_HAND / INVENTORY TO ACTIVATE THE EFFECTS
+      mode: "IN_HAND" # IN_HAND / INVENTORY / ON USE   |   TO ACTIVATE THE EFFECTS
       effects:
       - "POISON 0 0" # 0 to infinite
 

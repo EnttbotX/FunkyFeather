@@ -8,14 +8,23 @@ import x.Entt.FunkyFeather.FF;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
+import java.util.logging.Level;
 
 public class FileHandler {
-
     private final FF plugin;
     private FileConfiguration config;
     private FileConfiguration messages;
     private final File configFile;
     private final File messagesFile;
+
+    private static final String RESPAWN_ENABLED_PATH = "Config.respawn-zone.enabled";
+    private static final String VAULT_ENABLED_PATH = "Config.Vault.enabled";
+    private static final String FEATHER_NAME_PATH = "Config.Feather.Name";
+    private static final String FEATHER_LORE_PATH = "Config.Feather.Lore";
+    private static final String RESPAWN_ZONE_PATH = "Config.respawn-zone.zone";
+    private static final String VAULT_GIVE_COST_PATH = "Config.Vault.give-cost";
+    private static final String VAULT_USE_COST_PATH = "Config.Vault.use-cost";
 
     private String name;
     private List<String> lore;
@@ -31,26 +40,25 @@ public class FileHandler {
         this.messagesFile = new File(plugin.getDataFolder(), "msg.yml");
 
         reloadConfig();
-        reloadMSGs();
+        reloadMessages();
         loadConfigValues();
     }
 
-    public void loadConfigValues() {
-        // Load config.yml values
-        setRespawnEnabled = config.getBoolean("Config.respawn-zone.enabled");
-        vaultIntEnabled = config.getBoolean("Config.Vault.enabled");
-        name = config.getString("Config.Feather.Name");
-        lore = config.getStringList("Config.Feather.Lore");
-        respawnZone = config.getStringList("Config.respawn-zone.zone");
-        giveCost = config.getInt("Config.Vault.give-cost");
-        useCost = config.getInt("Config.Vault.use-cost");
+    private void loadConfigValues() {
+        setRespawnEnabled = config.getBoolean(RESPAWN_ENABLED_PATH, false);
+        vaultIntEnabled = config.getBoolean(VAULT_ENABLED_PATH, false);
+        name = config.getString(FEATHER_NAME_PATH, MSG.color("&5FunkyFeather"));
+        lore = config.getStringList(FEATHER_LORE_PATH);
+        respawnZone = config.getStringList(RESPAWN_ZONE_PATH);
+        giveCost = config.getInt(VAULT_GIVE_COST_PATH, 0);
+        useCost = config.getInt(VAULT_USE_COST_PATH, 0);
     }
 
     public void saveConfig() {
         try {
             config.save(configFile);
         } catch (IOException e) {
-            plugin.getLogger().warning("Couldn't save config.yml!");
+            plugin.getLogger().log(Level.WARNING, "Couldn't save config.yml!", e);
         }
     }
 
@@ -59,9 +67,10 @@ public class FileHandler {
             plugin.saveResource("config.yml", false);
         }
         this.config = YamlConfiguration.loadConfiguration(configFile);
+        loadConfigValues();
     }
 
-    public void reloadMSGs() {
+    public void reloadMessages() {
         if (!messagesFile.exists()) {
             plugin.saveResource("msg.yml", false);
         }
@@ -76,8 +85,8 @@ public class FileHandler {
         return messages;
     }
 
-    public String getName() {
-        return name;
+    public Optional<String> getName() {
+        return Optional.ofNullable(name);
     }
 
     public List<String> getLore() {
@@ -92,9 +101,7 @@ public class FileHandler {
         return setRespawnEnabled;
     }
 
-    public boolean isVaultIntEnabled() {
-        return vaultIntEnabled;
-    }
+    public boolean isVaultIntEnabled() {return vaultIntEnabled;}
 
     public int getGiveCost() {
         return giveCost;

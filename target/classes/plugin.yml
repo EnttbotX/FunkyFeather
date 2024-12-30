@@ -1,5 +1,5 @@
 main: x.Entt.FunkyFeather.FF
-version: 1.3.0
+version: 1.4.0
 name: FunkyFeather
 authors: [Enttbot]
 description: "Keep items or exp on death if you have the Funky Feather"
@@ -10,18 +10,25 @@ softdepend:
 
 commands:
   funkyfeather:
-    description: main command of ff.
+    description: The main command of FF.
     aliases:
-      - ff
+    - ff
 
 permissions:
   ff.*:
     description: access to all permissions and commands of ff.
     default: op
     children:
+      ff.admin: true
       ff.keep: true
       ff.setrespawn: true
       ff.give-feather: true
+  ff.withoutcost:
+    description: get the feather or special item for free
+    default: op
+  ff.admin:
+    description: permission to admins
+    default: op
   ff.keep:
     description: use an special feather.
     default: true

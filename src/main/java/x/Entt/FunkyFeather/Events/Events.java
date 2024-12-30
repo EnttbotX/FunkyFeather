@@ -1,10 +1,11 @@
 package x.Entt.FunkyFeather.Events;
 
+import me.clip.placeholderapi.PlaceholderAPI;
+
 import x.Entt.FunkyFeather.FF;
 import x.Entt.FunkyFeather.Utils.FileHandler;
 import x.Entt.FunkyFeather.Utils.InvHandler;
 import x.Entt.FunkyFeather.Utils.MSG;
-import x.Entt.FunkyFeather.Utils.UpdateLogger;
 
 import net.milkbowl.vault.economy.Economy;
 
@@ -17,179 +18,147 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import static x.Entt.FunkyFeather.FF.prefix;
-
 public class Events implements Listener {
-    private final boolean hasMethod;
     private final FF plugin;
     private final Economy econ;
-    private UpdateLogger updateChecker;
-    private final int resourceId = 115289;
 
     public Events(FF plugin) {
         this.plugin = plugin;
-        this.hasMethod = hasMethod("setKeepInventory");
         this.econ = FF.econ;
     }
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
         Player player = event.getEntity();
-
-        if (player.hasPermission("ff.keep") && hasFF(player)) {
-            if (!hasMethod) {
-                InvHandler.getInstance().saveInventoryAndArmor(player);
-                event.getDrops().clear();
-            } else {
-                event.setKeepInventory(true);
-                event.getDrops().clear();
-                event.setKeepLevel(true);
-                event.setDroppedExp(0);
-            }
+        if (player.hasPermission("ff.keep") && hasFunkyFeather(player)) {
+            handlePlayerDeath(event, player);
         }
+
+        useFunkyFeather(player);
     }
 
-    private boolean hasFF(Player player) {
-        FileHandler fh = plugin.getFH();
-        FileConfiguration config = fh.getConfig();
-
-        for (ItemStack item : player.getInventory().getContents()) {
-            if (item != null && isFunkyFeather(item, config)) {
-                return true;
-            }
+    private void handlePlayerDeath(PlayerDeathEvent event, Player player) {
+        if (player.hasPermission("ff.keep") && hasFunkyFeather(player)) {
+            event.setKeepInventory(true);
+            event.setKeepLevel(true);
+            event.getDrops().clear();
+            event.setDroppedExp(0);
         }
-        return false;
-    }
-
-    private boolean isFunkyFeather(ItemStack item, FileConfiguration config) {
-        if (item.getType() == Material.FEATHER && item.hasItemMeta() && item.getItemMeta().hasDisplayName()) {
-            String displayName = MSG.color(config.getString("Feather.Name"));
-            return item.getItemMeta().getDisplayName().equals(displayName);
-        }
-        return false;
-    }
-
-    private boolean hasMethod(String methodName) {
-        for (Method method : PlayerDeathEvent.class.getMethods()) {
-            if (method.getName().equals(methodName)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent event) {
+        FileHandler fh = plugin.getFH();
         Player player = event.getPlayer();
+        FileConfiguration config = fh.getConfig();
 
-        if (player.hasPermission("ff.keep") && hasFF(player)) {
-            FileHandler fh = plugin.getFH();
-            FileConfiguration config = fh.getConfig();
-
-            if (config.getBoolean("respawn-zone.set-respawn-enabled")) {
+        if (player.hasPermission("ff.keep") && hasFunkyFeather(player)) {
+            if (fh.isSetRespawnEnabled()) {
                 String path = "respawn-zone.zone";
                 if (config.contains(path)) {
-                    double x = config.getDouble(path + ".x");
-                    double y = config.getDouble(path + ".y");
-                    double z = config.getDouble(path + ".z");
-                    float yaw = (float) config.getDouble(path + ".yaw");
-                    float pitch = (float) config.getDouble(path + ".pitch");
                     World world = plugin.getServer().getWorld(Objects.requireNonNull(config.getString(path + ".world")));
+                    if (world != null) {
+                        Location location = new Location(
+                                world,
+                                config.getDouble(path + ".x"),
+                                config.getDouble(path + ".y"),
+                                config.getDouble(path + ".z"),
+                                (float) config.getDouble(path + ".yaw"),
+                                (float) config.getDouble(path + ".pitch")
+                        );
 
-                    Location location = new Location(world, x, y, z, yaw, pitch);
-                    plugin.getServer().getScheduler().runTask(plugin, () -> player.teleport(location));
+                        player.teleport(location);
+                    }
                 }
             }
-
-            useFeather(player);
         }
 
-        InvHandler ih = InvHandler.getInstance();
-        if (ih.hasInventorySaved(player) && ih.hasArmorSaved(player)) {
-            player.getInventory().setContents(ih.loadInventory(player));
-            player.getInventory().setArmorContents(ih.loadArmor(player));
-            ih.removeInventoryAndArmor(player);
+        restorePlayerInventory(player);
+    }
+
+    private void restorePlayerInventory(Player player) {
+        InvHandler invHandler = InvHandler.getInstance();
+        if (invHandler.hasInventorySaved(player) && invHandler.hasArmorSaved(player)) {
+            player.getInventory().setContents(invHandler.loadInventory(player));
+            player.getInventory().setArmorContents(invHandler.loadArmor(player));
+            invHandler.removeInventoryAndArmor(player);
         }
     }
 
-    private void useFeather(Player player) {
+    private boolean hasFunkyFeather(Player player) {
         FileHandler fh = plugin.getFH();
-        FileConfiguration config = fh.getConfig();
-        ItemStack feather = findFunkyFeather(player);
-        String showName = config.getString("Feather.Name");
-        int useCost = fh.getUseCost();
+        return Arrays.stream(player.getInventory().getContents())
+                .filter(Objects::nonNull)
+                .anyMatch(item -> isFunkyFeather(item, fh.getConfig()));
+    }
 
+    private boolean isFunkyFeather(ItemStack item, FileConfiguration config) {
+        return item.getType() == Material.FEATHER &&
+                item.hasItemMeta() &&
+                Objects.requireNonNull(item.getItemMeta()).hasDisplayName() &&
+                MSG.color(config.getString("Feather.Name"))
+                        .equals(item.getItemMeta().getDisplayName()) &&
+                Objects.equals(item.getItemMeta().getLore(),
+                        config.getStringList(MSG.color("Feather.Lore")));
+    }
+
+    private void useFunkyFeather(Player player) {
+        ItemStack feather = findFunkyFeather(player);
         if (feather != null) {
-            if (fh.isVaultIntEnabled()) {
-                if (useCost > 0) {
-                    if (econ.getBalance(player) >= useCost) {
-                        handleFeatherUsage(player, feather, useCost);
-                    } else {
-                        sendMessage(player, "Messages.no_money");
-                    }
+            int useCost = plugin.getFH().getUseCost();
+            if (plugin.getFH().isVaultIntEnabled() && useCost > 0) {
+                if (econ.getBalance(player) >= useCost) {
+                    processFeatherUsage(player, feather, useCost);
                 } else {
-                    handleFeatherUsage(player, feather, useCost);
+                    sendPlayerMessage(player, "Messages.no_money");
                 }
             } else {
-                handleFeatherUsage(player, feather, 0);
+                processFeatherUsage(player, feather, useCost);
             }
         } else {
-            sendMessage(player, "Messages.no_feathers");
+            sendPlayerMessage(player, "Messages.no_feathers");
         }
     }
 
-    private void handleFeatherUsage(Player player, ItemStack feather, int useCost) {
-        FileHandler fh = plugin.getFH();
+    private void processFeatherUsage(Player player, ItemStack feather, int useCost) {
         int amount = feather.getAmount();
         if (amount > 0) {
             feather.setAmount(amount - 1);
             if (useCost > 0) {
                 econ.withdrawPlayer(player, useCost);
             }
-            sendMessage(player, "Messages.use");
+            sendPlayerMessage(player, "use");
         } else {
-            player.sendMessage(MSG.color(prefix + fh.getMessages().getString("last_feather_used")));
+            player.sendMessage(MSG.color(plugin.getFH().getMessages().getString("Messages.last_feather_used")));
         }
-    }
-
-    private void sendMessage(Player player, String path) {
-        FileConfiguration config = plugin.getFH().getConfig();
-        List<String> messages = config.getStringList(path);
-        String messageFormat = String.join("\n", messages);
-        player.sendMessage(MSG.color(messageFormat.replace("%ff_name%", Objects.requireNonNull(config.getString("Feather.Name"))).replace("%player%", player.getName())));
     }
 
     private ItemStack findFunkyFeather(Player player) {
-        FileHandler fh = plugin.getFH();
-        for (ItemStack item : player.getInventory().getContents()) {
-            if (item != null && isFunkyFeather(item, fh.getConfig())) {
-                return item;
-            }
-        }
-        return null;
+        return Arrays.stream(player.getInventory().getContents())
+                .filter(Objects::nonNull)
+                .filter(item -> isFunkyFeather(item, plugin.getFH().getConfig()))
+                .findFirst().orElse(null);
     }
 
-    @EventHandler
-    public void onJoin(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
+    private void sendPlayerMessage(Player player, String path) {
+        FileConfiguration config = plugin.getFH().getConfig();
+        List<String> messages = config.getStringList(path);
 
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            try {
-                updateChecker = new UpdateLogger(plugin, resourceId);
-                if (updateChecker.isUpdateAvailable()) {
-                    player.sendMessage(MSG.color(prefix + "&cThere is a new update of the plugin"));
-                }
-            } catch (Exception e) {
-                player.sendMessage(MSG.color(prefix + "&4&lError searching new versions: " + e.getMessage()));
-            }
-        }, 20 * 20L);
+        String formattedMessage = String.join("\n", messages);
+
+        formattedMessage = formattedMessage.replace("%ff_name%", Objects.requireNonNull(config.getString("Feather.Name")));
+
+        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+            formattedMessage = PlaceholderAPI.setPlaceholders(player, formattedMessage);
+        }
+
+        player.sendMessage(MSG.color(formattedMessage));
     }
 }

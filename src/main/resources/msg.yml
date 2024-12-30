@@ -9,23 +9,22 @@
 
 # placeholders [PlaceholderAPI Support]:
 # %ff_name% = gets the name of the feather
-# %ff_player% = gets the name of the player name arg in a command
 
 prefix: "&5&l[&d&lFunky Feather&5&l] "
 
-
 # ---------------------------------------------------
 
-
-give: "&2&lYou receive a %ff_name% &8&l[COST 123]"
-give-no-cost: "&2&lYou receive a %ff_name% &8&l[FREE]"
-use:  "&2&lYour inventory has been kept! &c[Cost: -1 %ff_name%]"
-last_feather_used: "&2You use your last %ff_name%!"
-no_money: "&cYou don't have enough money to use/get a %ff_name%"
-no_feathers: "&cYou don't have any %ff_name%"
-no_permission: "&cYou don't have perms to do that"
-set-respawn: "&2Respawn set"
-replace-respawn: "&2New respawn point set"
-respawn-disabled: "&cCant set spawn: &lSetSpawn disabled in config."
-reload: "&2Config reloaded!"
-for-players: "&cConsole cant use this command"
+Messages:
+  give: "&2&lYou receive a %ff_name% &8&l[COST 123]"
+  give-no-cost: "&2&lYou receive a %ff_name% &8&l[FREE]"
+  use:  "&2&lYour inventory has been kept! &c[Cost: -1 %ff_name%]"
+  last_feather_used: "&2You use your last %ff_name%!"
+  no_money: "&cYou don't have enough money to use/get a %ff_name%"
+  no_feathers: "&cYou don't have any %ff_name%"
+  no_permission: "&cYou don't have perms to do that"
+  set-respawn: "&2Respawn set"
+  replace-respawn: "&2New respawn point set"
+  respawn-disabled: "&cCant set spawn: &lSetSpawn disabled in config."
+  reload: "&2Config reloaded!"
+  for-players: "&cConsole cant use this command"
+  usage-give: "&c&lUSE: &f/ff give [player]"
